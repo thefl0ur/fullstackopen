@@ -22,6 +22,14 @@ const Content = ({name, exercises}) => {
   )
 }
 
+const Total = ({count}) => {
+  return (
+    <div>
+      <p>Number of exercises: <b>{count}</b></p>
+    </div>
+  )
+}
+
 const Course = ({course}) => {
   return (
     <div>
@@ -33,6 +41,7 @@ const Course = ({course}) => {
           )
         )
       }
+      <Total count={course.parts.reduce((summ, current) => summ + current.exercises, 0)}/>
     </div>
   )
 }
