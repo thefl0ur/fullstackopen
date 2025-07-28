@@ -8,10 +8,15 @@ const Person = ({person}) => {
 
 const App = () => {
   const [persons, setPersons] = useState([
-    { name: 'Arto Hellas', phoneNumber: '040-1234567', id: '1'},
+    { name: 'Arto Hellas', phoneNumber: '040-123456', id: '1' },
+    { name: 'Ada Lovelace', phoneNumber: '39-44-5323523', id: '2' },
+    { name: 'Dan Abramov', phoneNumber: '12-43-234345', id: '3' },
+    { name: 'Mary Poppendieck', phoneNumber: '39-23-6423122', id: '4' }
   ]) 
+
   const [newName, setNewName] = useState('')
   const [newPhone, setNewPhone] = useState('')
+  const [newFilter, setnewFilter] = useState('')
 
   const onChangeNameInput = (event) => {
     setNewName(event.target.value)
@@ -19,6 +24,16 @@ const App = () => {
 
   const onChangePhonenNumberInput = (event) => {
     setNewPhone(event.target.value)
+  }
+  const filteredPersons = newFilter
+    ? persons.filter(person => (
+        person.name.toLocaleLowerCase().indexOf(newFilter.toLocaleLowerCase()) != -1
+      )
+    )
+    : persons
+  const onChangeFilterInput = (event) => {
+    setnewFilter(event.target.value)
+
   }
 
   const onSubmit = (event) => {
@@ -43,6 +58,10 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <div>
+        Filter shown with: <input onChange={onChangeFilterInput} value={newFilter}/>
+      </div>
+      <br/>
       <form onSubmit={onSubmit}>
         <div>
           name: <input value={newName} onChange={onChangeNameInput}/>
@@ -56,7 +75,7 @@ const App = () => {
       </form>
       <h2>Numbers</h2>
       {
-        persons.map(person => (
+        filteredPersons.map(person => (
           <Person key={person.id} person={person}/>
           )
         )
