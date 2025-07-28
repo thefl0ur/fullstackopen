@@ -2,18 +2,23 @@ import { useState } from 'react'
 
 const Person = ({person}) => {
   return (
-    <p>{person.name}</p>
+    <p>{person.name} {person.phoneNumber}</p>
   )
 }
 
 const App = () => {
   const [persons, setPersons] = useState([
-    { name: 'Arto Hellas', id: '1'},
+    { name: 'Arto Hellas', phoneNumber: '040-1234567', id: '1'},
   ]) 
   const [newName, setNewName] = useState('')
+  const [newPhone, setNewPhone] = useState('')
 
-  const onChange = (event) => {
+  const onChangeNameInput = (event) => {
     setNewName(event.target.value)
+  }
+
+  const onChangePhonenNumberInput = (event) => {
+    setNewPhone(event.target.value)
   }
 
   const onSubmit = (event) => {
@@ -26,11 +31,13 @@ const App = () => {
 
     let newUser = {
       name: newName,
-      id: String(persons.length + 1)
+      id: String(persons.length + 1),
+      phoneNumber: newPhone
     }
 
     setPersons(persons.concat(newUser));
     setNewName('')
+    setNewPhone('')
   }
 
   return (
@@ -38,7 +45,10 @@ const App = () => {
       <h2>Phonebook</h2>
       <form onSubmit={onSubmit}>
         <div>
-          name: <input value={newName} onChange={onChange}/>
+          name: <input value={newName} onChange={onChangeNameInput}/>
+        </div>
+        <div>
+        number: <input value={newPhone} onChange={onChangePhonenNumberInput}/>
         </div>
         <div>
           <button type="submit">add</button>
