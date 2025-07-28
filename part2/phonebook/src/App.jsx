@@ -19,6 +19,11 @@ const App = () => {
   const onSubmit = (event) => {
     event.preventDefault()
 
+    if (persons.filter(person => person.name == newName).length){
+        alert(`${newName} is already added to phonebook`)
+        return
+    }
+
     let newUser = {
       name: newName,
       id: String(persons.length + 1)
