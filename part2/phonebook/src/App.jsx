@@ -13,13 +13,13 @@ const App = () => {
   const [newFilter, setnewFilter] = useState('')
 
   const getPersons = () => {
-    PersonService.getPersons().then(persons => {
+    PersonService.get().then(persons => {
       setPersons(persons)
     })
   }
 
   const savePerson = (person) => {
-    PersonService.savePerson(person).then(person => {
+    PersonService.save(person).then(person => {
         setPersons(persons.concat(person))
         setNewName('')
         setNewPhone('')
@@ -65,6 +65,16 @@ const App = () => {
     savePerson(newUser)
   }
 
+  const onDelete = (id) => {
+    const personToRemove = persons.find(person => person.id == id)
+    if (window.confirm(`Delete user ${personToRemove.name}?`)) {
+      PersonService.remove(personToRemove).then(
+        personRemoved => {
+          setPersons(persons.filter(person => person.id != personRemoved.id))
+        }
+      )
+    }
+  }
   return (
     <div>
       <h2>Phonebook</h2>
@@ -78,7 +88,7 @@ const App = () => {
         submit={onSubmit}
       />
       <h2>Numbers</h2>
-      <Display persons={filteredPersons}/>
+      <Display persons={filteredPersons} deleteHandler={onDelete}/>
     </div>
   )
 }
