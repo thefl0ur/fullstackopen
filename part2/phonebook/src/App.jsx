@@ -1,15 +1,11 @@
 import { useState, useEffect } from 'react'
 
-import axios from 'axios'
-
 import AddForm from './AddForm'
 import FilterForm from './FilterForm'
 import Display from './Display'
-
+import PersonService from './PersonService'
 
 const App = () => {
-  const baseUrl = "http://localhost:3001/persons"
-
   const [persons, setPersons] = useState([])
 
   const [newName, setNewName] = useState('')
@@ -17,14 +13,14 @@ const App = () => {
   const [newFilter, setnewFilter] = useState('')
 
   const getPersons = () => {
-    axios.get(baseUrl).then(response => {
-      setPersons(response.data)
+    PersonService.getPersons().then(persons => {
+      setPersons(persons)
     })
   }
 
   const savePerson = (person) => {
-    axios.post(baseUrl, person).then(response => {
-        setPersons(persons.concat(response.data))
+    PersonService.savePerson(person).then(person => {
+        setPersons(persons.concat(person))
         setNewName('')
         setNewPhone('')
       }
