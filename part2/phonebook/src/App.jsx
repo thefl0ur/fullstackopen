@@ -8,6 +8,8 @@ import Display from './Display'
 
 
 const App = () => {
+  const baseUrl = "http://localhost:3001/persons"
+
   const [persons, setPersons] = useState([])
 
   const [newName, setNewName] = useState('')
@@ -15,9 +17,18 @@ const App = () => {
   const [newFilter, setnewFilter] = useState('')
 
   const getPersons = () => {
-    axios.get("http://localhost:3001/persons").then(response => {
+    axios.get(baseUrl).then(response => {
       setPersons(response.data)
     })
+  }
+
+  const savePerson = (person) => {
+    axios.post(baseUrl, person).then(response => {
+        setPersons(persons.concat(response.data))
+        setNewName('')
+        setNewPhone('')
+      }
+    )
   }
   
   useEffect(getPersons, [])
@@ -55,9 +66,7 @@ const App = () => {
       phoneNumber: newPhone
     }
 
-    setPersons(persons.concat(newUser));
-    setNewName('')
-    setNewPhone('')
+    savePerson(newUser)
   }
 
   return (
