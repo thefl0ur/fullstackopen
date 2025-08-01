@@ -51,9 +51,14 @@ const App = () => {
   const onSubmit = (event) => {
     event.preventDefault()
 
-    if (persons.filter(person => person.name == newName).length){
-        alert(`${newName} is already added to phonebook`)
-        return
+    const existingUser = persons.find(person => person.name == newName)
+    if (existingUser){
+        if (window.confirm(`${existingUser.name} is already in phonebook. Update record?`)) {
+            return updatePerson({...existingUser, phoneNumber: newPhone})
+        }
+        else {
+          return
+        }
     }
 
     let newUser = {
@@ -75,6 +80,13 @@ const App = () => {
       )
     }
   }
+
+  const updatePerson = (person) => {
+    PersonService.update(person).then(updatedPerson => {
+      setPersons(persons.map(person => person.id == updatedPerson.id ? updatedPerson: person))
+    })
+  }
+
   return (
     <div>
       <h2>Phonebook</h2>
@@ -86,6 +98,7 @@ const App = () => {
         changeNameInput={onChangeNameInput}
         changePhoneInput={onChangePhonenNumberInput}
         submit={onSubmit}
+        isEnabled={newPhone.length > 0 & newName.length > 0}
       />
       <h2>Numbers</h2>
       <Display persons={filteredPersons} deleteHandler={onDelete}/>

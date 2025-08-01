@@ -8,7 +8,7 @@ const AddForm = (props) => {
       number: <input value={props.newPhone} onChange={props.changePhoneInput}/>
       </div>
       <div>
-      <button type="submit">add</button>
+      <button type="submit" disabled={!props.isEnabled}>add</button>
       </div>
     </form>
   )
