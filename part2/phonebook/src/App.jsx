@@ -4,6 +4,7 @@ import AddForm from './AddForm'
 import FilterForm from './FilterForm'
 import Display from './Display'
 import PersonService from './PersonService'
+import Notification from './Notification'
 
 const App = () => {
   const [persons, setPersons] = useState([])
@@ -11,7 +12,17 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newPhone, setNewPhone] = useState('')
   const [newFilter, setnewFilter] = useState('')
+  const [notification, setNotification] = useState(null)
 
+  const showMessage = (text, isError) => {
+    setNotification({
+      message: text,
+      isError: isError,
+    })
+    setTimeout(() => {
+      setNotification(null)
+    }, 5000)
+  }
   const getPersons = () => {
     PersonService.get().then(persons => {
       setPersons(persons)
@@ -23,6 +34,7 @@ const App = () => {
         setPersons(persons.concat(person))
         setNewName('')
         setNewPhone('')
+        showMessage(`User ${person.name} was added`, false)
       }
     )
   }
@@ -82,9 +94,16 @@ const App = () => {
   }
 
   const updatePerson = (person) => {
-    PersonService.update(person).then(updatedPerson => {
-      setPersons(persons.map(person => person.id == updatedPerson.id ? updatedPerson: person))
-    })
+    PersonService.update(person).then(
+      updatedPerson => {
+        setPersons(persons.map(person => person.id == updatedPerson.id ? updatedPerson: person))
+      }
+    ).catch(
+      error => {
+        const message = error.status == 404? `User ${person.name} was not found`: 'Something gone wrong'
+        showMessage(message, true)
+      }
+    )
   }
 
   return (
@@ -100,6 +119,7 @@ const App = () => {
         submit={onSubmit}
         isEnabled={newPhone.length > 0 & newName.length > 0}
       />
+      <Notification notification={notification}/>
       <h2>Numbers</h2>
       <Display persons={filteredPersons} deleteHandler={onDelete}/>
     </div>
