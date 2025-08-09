@@ -5,12 +5,12 @@ const get = (city) => {
 
     const request = axios.get(`https://api.weatherbit.io/v2.0/current?city=${city}&key=${apiKey}`)
     return request.then(response => {
-        const raw_data = response.data['data'][0]
+        const rawData = response.data['data'][0]
         return {
-            "temp": raw_data['temp'],
-            "wind": `${raw_data['wind_spd']} ${raw_data['wind_cdir']}`,
-            "icon": `https://cdn.weatherbit.io/static/img/icons/${raw_data["weather"]["icon"]}.png`,
-            "description": raw_data["weather"]["description"]
+            "temp": rawData['temp'],
+            "wind": `${rawData['wind_spd']} ${rawData['wind_cdir']}`,
+            "icon": `https://cdn.weatherbit.io/static/img/icons/${rawData["weather"]["icon"]}.png`,
+            "description": rawData["weather"]["description"]
         }
     })
 }
