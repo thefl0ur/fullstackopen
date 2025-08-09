@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react'
 
-import CountryService from './CountryService'
-import Display from './Display'
-
+import CountryService from './Services/CountryService'
+import Display from './Components/Display'
 
 
 function App() {
