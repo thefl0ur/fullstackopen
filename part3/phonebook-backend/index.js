@@ -1,5 +1,6 @@
 const express = require("express")
 const app = express()
+app.use(express.json())
 
 const PORT = 3001
 let notes = [
@@ -24,6 +25,10 @@ let notes = [
       "number": "39-23-6423122"
     }
 ]
+
+const genId = () => {
+    return String(Math.floor(Math.random() * 100 + 1))
+}
 
 app.get("/api/persons", (req, resp) => {
     resp.json(notes)
@@ -53,6 +58,14 @@ app.delete("/api/persons/:id", (req, resp) => {
     }
 
     return resp.status(204).end()
+})
+
+app.post("/api/persons/", (req, resp) => {
+    const note = req.body
+    note.id = genId()
+
+    notes = notes.concat(note)
+    resp.json(note)
 })
 
 app.listen(PORT, () => {console.log(`Start webserver on ${PORT}`)})
