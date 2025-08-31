@@ -45,4 +45,14 @@ app.get("/api/persons/:id", (req, resp) => {
     resp.json(note)
 })
 
+app.delete("/api/persons/:id", (req, resp) => {
+    const index = notes.findIndex(x=>x.id == req.params.id)
+
+    if (index >= 0) {
+        notes.splice(index, 1)
+    }
+
+    return resp.status(204).end()
+})
+
 app.listen(PORT, () => {console.log(`Start webserver on ${PORT}`)})
