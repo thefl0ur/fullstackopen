@@ -29,4 +29,10 @@ app.get("/api/persons", (req, resp) => {
     resp.json(notes)
 })
 
+app.get("/info", (req, resp) => {
+    resp.send(
+        `<p>Phonebook contains info for ${notes.length} persons<br>${new Date()}</p>`
+    )
+})
+
 app.listen(PORT, () => {console.log(`Start webserver on ${PORT}`)})
