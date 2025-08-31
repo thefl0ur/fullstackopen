@@ -62,8 +62,17 @@ app.delete("/api/persons/:id", (req, resp) => {
 
 app.post("/api/persons/", (req, resp) => {
     const note = req.body
-    note.id = genId()
 
+    if (!note.name || !note.number) {
+        return resp.status(400).send({"error": "Missing required field"})
+    }
+
+    const index = notes.findIndex(x => x.name == note.name)
+    if (index != -1) {
+        return resp.status(409).send({"error": "Name should be unique"})
+    }
+
+    note.id = genId()
     notes = notes.concat(note)
     resp.json(note)
 })
