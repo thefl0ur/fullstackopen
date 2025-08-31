@@ -35,4 +35,14 @@ app.get("/info", (req, resp) => {
     )
 })
 
+app.get("/api/persons/:id", (req, resp) => {
+    const note = notes.find(x => x.id == req.params.id)
+
+    if (!note){
+        return resp.status(404).end()
+    }
+
+    resp.json(note)
+})
+
 app.listen(PORT, () => {console.log(`Start webserver on ${PORT}`)})
