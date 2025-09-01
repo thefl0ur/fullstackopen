@@ -23,6 +23,7 @@ const App = () => {
       setNotification(null)
     }, 5000)
   }
+
   const getPersons = () => {
     PersonService.get().then(persons => {
       setPersons(persons)
@@ -48,6 +49,7 @@ const App = () => {
   const onChangePhonenNumberInput = (event) => {
     setNewPhone(event.target.value)
   }
+
   const filteredPersons = newFilter
     ? persons.filter(person => (
         person.name.toLocaleLowerCase().indexOf(newFilter.toLocaleLowerCase()) != -1
@@ -74,9 +76,8 @@ const App = () => {
     }
 
     let newUser = {
+      number: newPhone,
       name: newName,
-      id: String(persons.length + 1),
-      phoneNumber: newPhone
     }
 
     savePerson(newUser)
@@ -86,8 +87,8 @@ const App = () => {
     const personToRemove = persons.find(person => person.id == id)
     if (window.confirm(`Delete user ${personToRemove.name}?`)) {
       PersonService.remove(personToRemove).then(
-        personRemoved => {
-          setPersons(persons.filter(person => person.id != personRemoved.id))
+        _ => {
+          setPersons(persons.filter(person => person.id != id))
         }
       )
     }

@@ -1,5 +1,6 @@
 const express = require("express")
 const morgan = require("morgan")
+const cors = require("cors")
 
 const LOGGING_FROMAT = ":method :url :status :res[content-length] - :response-time ms - :body"
 const PORT = 3001
@@ -33,6 +34,7 @@ morgan.token('body', (req) => {
 const app = express()
 app.use(express.json())
 app.use(morgan(LOGGING_FROMAT))
+app.use(cors())
 
 const genId = () => {
     return String(Math.floor(Math.random() * 100 + 1))
