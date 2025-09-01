@@ -1,10 +1,7 @@
 const express = require("express")
 const morgan = require("morgan")
 
-const app = express()
-app.use(express.json())
-app.use(morgan("tiny"))
-
+const LOGGING_FROMAT = ":method :url :status :res[content-length] - :response-time ms - :body"
 const PORT = 3001
 let notes = [
     { 
@@ -28,6 +25,14 @@ let notes = [
       "number": "39-23-6423122"
     }
 ]
+
+morgan.token('body', (req) => {
+    return JSON.stringify(req.body)
+})
+
+const app = express()
+app.use(express.json())
+app.use(morgan(LOGGING_FROMAT))
 
 const genId = () => {
     return String(Math.floor(Math.random() * 100 + 1))
@@ -64,7 +69,11 @@ app.delete("/api/persons/:id", (req, resp) => {
 })
 
 app.post("/api/persons/", (req, resp) => {
-    const note = req.body
+    const note = {
+        "id": genId(),
+        "name": req.body.name,
+        "number": req.body.number,
+    }
 
     if (!note.name || !note.number) {
         return resp.status(400).send({"error": "Missing required field"})
@@ -75,7 +84,6 @@ app.post("/api/persons/", (req, resp) => {
         return resp.status(409).send({"error": "Name should be unique"})
     }
 
-    note.id = genId()
     notes = notes.concat(note)
     resp.json(note)
 })
