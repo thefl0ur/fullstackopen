@@ -3,7 +3,7 @@ const morgan = require("morgan")
 const cors = require("cors")
 
 const LOGGING_FROMAT = ":method :url :status :res[content-length] - :response-time ms - :body"
-const PORT = 3001
+const PORT = process.env.PORT || 3001
 let notes = [
     { 
       "id": "1",
