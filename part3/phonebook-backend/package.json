@@ -8,12 +8,19 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "npm install && npm run build:ui && npm run build:dist",
     "build:ui": "npm --prefix ../../part2/phonebook/ install",
-    "build:dist": "rm -rf dist && npm run build --prefix ../../part2/phonebook/ && cp -r ../../part2/phonebook/dist ."
+    "build:dist": "rm -rf dist && npm run build --prefix ../../part2/phonebook/ && cp -r ../../part2/phonebook/dist .",
+    "lint": "eslint ."
   },
   "dependencies": {
     "dotenv": "^17.2.2",
     "express": "^5.1.0",
     "mongoose": "^8.18.0",
     "morgan": "^1.10.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.34.0",
+    "@stylistic/eslint-plugin-js": "^4.4.1",
+    "eslint": "^9.34.0",
+    "globals": "^16.3.0"
   }
 }
