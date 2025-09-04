@@ -81,6 +81,32 @@ app.post("/api/persons/", (req, resp, next) => {
     )
 })
 
+app.put("/api/persons/:id", (req, resp, next) => {
+    const updateData = new PhonebookRecord({
+        "name": req.body.name,
+        "number": req.body.number,
+    })
+
+    PhonebookRecord.findById(req.params.id).then(
+        record => {
+            if (!record) {
+                return response.status(404).end()
+            }
+
+            record.name = updateData.name
+            record.number = updateData.number
+
+            return record.save().then(
+                updatedRecord => {
+                    resp.json(updatedRecord)
+                }
+            )
+        }
+    ).catch(
+        error => next(error)
+    )
+})
+
 app.use(unknownEndpointHandler)
 app.use(errorHandler)
 
