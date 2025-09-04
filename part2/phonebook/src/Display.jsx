@@ -14,7 +14,7 @@ const Display = ({persons, deleteHandler}) => {
 const Person = ({person, deleteHandler}) => {
   return (
     <div>
-      {person.name} {person.phoneNumber} &nbsp;
+      {person.name} {person.number} &nbsp;
       <button onClick={() => {deleteHandler(person.id)}}>Delete</button>
     </div>
   )

@@ -68,7 +68,7 @@ const App = () => {
     const existingUser = persons.find(person => person.name == newName)
     if (existingUser){
         if (window.confirm(`${existingUser.name} is already in phonebook. Update record?`)) {
-            return updatePerson({...existingUser, phoneNumber: newPhone})
+            return updatePerson({...existingUser, number: newPhone})
         }
         else {
           return
@@ -98,6 +98,8 @@ const App = () => {
     PersonService.update(person).then(
       updatedPerson => {
         setPersons(persons.map(person => person.id == updatedPerson.id ? updatedPerson: person))
+        setNewName('')
+        setNewPhone('')
       }
     ).catch(
       error => {
