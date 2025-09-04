@@ -39,13 +39,11 @@ app.get("/api/persons/:id", (req, resp) => {
 })
 
 app.delete("/api/persons/:id", (req, resp) => {
-    const index = notes.findIndex(x=>x.id == req.params.id)
-
-    if (index >= 0) {
-        notes.splice(index, 1)
-    }
-
-    return resp.status(204).end()
+    PhonebookRecord.findByIdAndDelete(req.params.id).then(
+        _ => {
+            return resp.status(204).end()
+        }
+    )
 })
 
 app.post("/api/persons/", (req, resp) => {
