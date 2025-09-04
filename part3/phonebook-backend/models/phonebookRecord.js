@@ -15,10 +15,20 @@ mongoose.connect(url)
 const phonebookRecordSchema = new mongoose.Schema({
     name: {
       type: String,
-      minLength: 3,
+      minLength: [3, "Should be at least 3 characters long."],
       required: true
     },
-    number: String,
+    number: {
+      type: String,
+      minLength: [8, "Should be at least 8 characters long."],
+      validate: {
+        validator: function(v) {
+          return /^\d{2,3}-\d+$/.test(v);
+        },
+        message: number => `${number.value} is not a valid phone number!`
+      },
+      required: true
+    }
 })
 
 phonebookRecordSchema.set('toJSON', {
