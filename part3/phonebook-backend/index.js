@@ -16,10 +16,6 @@ app.use(express.json())
 app.use(morgan(LOGGING_FROMAT))
 app.use(express.static('dist'))
 
-const genId = () => {
-    return String(Math.floor(Math.random() * 100 + 1))
-}
-
 app.get("/api/persons", (req, resp) => {
     PhonebookRecord.find({}).then(
        records => { resp.json(records) }
@@ -53,23 +49,18 @@ app.delete("/api/persons/:id", (req, resp) => {
 })
 
 app.post("/api/persons/", (req, resp) => {
-    const note = {
-        "id": genId(),
+    const record = new PhonebookRecord({
         "name": req.body.name,
         "number": req.body.number,
-    }
+    })
 
-    if (!note.name || !note.number) {
+    if (!record.name || !record.number) {
         return resp.status(400).send({"error": "Missing required field"})
     }
 
-    const index = notes.findIndex(x => x.name == note.name)
-    if (index != -1) {
-        return resp.status(409).send({"error": "Name should be unique"})
-    }
-
-    notes = notes.concat(note)
-    resp.json(note)
+    record.save().then( addedRecord => {
+        resp.json(addedRecord)
+    })
 })
 
 app.listen(PORT, () => {console.log(`Start webserver on ${PORT}`)})
