@@ -37,6 +37,10 @@ const App = () => {
         setNewPhone('')
         showMessage(`User ${person.name} was added`, false)
       }
+    ).catch(
+      error => {
+        showMessage(error.response.data.error, true)
+      }
     )
   }
   
@@ -103,7 +107,13 @@ const App = () => {
       }
     ).catch(
       error => {
-        const message = error.status == 404? `User ${person.name} was not found`: 'Something gone wrong'
+        let message = 'Something gone wrong'
+        if (error.status == 404) {
+          message = `User ${person.name} was not found`
+        }
+        else if (error.status == 400) {
+          message = error.response.data.error
+        }
         showMessage(message, true)
       }
     )
