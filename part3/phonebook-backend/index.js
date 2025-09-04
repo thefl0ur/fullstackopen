@@ -38,20 +38,33 @@ app.get("/api/persons", (req, resp, next) => {
     )
 })
 
-app.get("/info", (req, resp) => {
-    resp.send(
-        `<p>Phonebook contains info for ${notes.length} persons<br>${new Date()}</p>`
-    )
+app.get("/info", (req, resp, next) => {
+   PhonebookRecord.find({}).countDocuments().exec().then(
+    result => {
+        resp.send(
+            `<p>Phonebook contains info for ${result} persons<br>${new Date()}</p>`
+        )
+    }
+   ).catch(
+    (error) => next(error)
+   )
+
 })
 
-app.get("/api/persons/:id", (req, resp) => {
-    const note = notes.find(x => x.id == req.params.id)
-
-    if (!note){
-        return resp.status(404).end()
-    }
-
-    resp.json(note)
+app.get("/api/persons/:id", (req, resp, next) => {
+    PhonebookRecord.findById(req.params.id).then(
+        record => {
+            if (record) {
+                resp.json(record)
+            }
+            else {
+                return resp.status(404).end()
+            }
+            
+        }
+    ).catch(
+        (error) => next(error)
+    )
 })
 
 app.delete("/api/persons/:id", (req, resp, next) => {
