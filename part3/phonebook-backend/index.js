@@ -1,30 +1,11 @@
+require("dotenv").config()
+
 const express = require("express")
 const morgan = require("morgan")
+const PhonebookRecord = require('./models/phonebookRecord')
 
 const LOGGING_FROMAT = ":method :url :status :res[content-length] - :response-time ms - :body"
-const PORT = process.env.PORT || 3001
-let notes = [
-    { 
-      "id": "1",
-      "name": "Arto Hellas", 
-      "number": "040-123456"
-    },
-    { 
-      "id": "2",
-      "name": "Ada Lovelace", 
-      "number": "39-44-5323523"
-    },
-    { 
-      "id": "3",
-      "name": "Dan Abramov", 
-      "number": "12-43-234345"
-    },
-    { 
-      "id": "4",
-      "name": "Mary Poppendieck", 
-      "number": "39-23-6423122"
-    }
-]
+const PORT = process.env.PORT
 
 morgan.token('body', (req) => {
     return JSON.stringify(req.body)
@@ -40,7 +21,9 @@ const genId = () => {
 }
 
 app.get("/api/persons", (req, resp) => {
-    resp.json(notes)
+    PhonebookRecord.find({}).then(
+       records => { resp.json(records) }
+    )
 })
 
 app.get("/info", (req, resp) => {
