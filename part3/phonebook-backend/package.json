@@ -9,10 +9,10 @@
     "build": "npm install && npm run build:ui && npm run build:dist",
     "build:ui": "npm --prefix ../../part2/phonebook/ install",
     "build:dist": "rm -rf dist && npm run build --prefix ../../part2/phonebook/ && cp -r ../../part2/phonebook/dist ."
- 
   },
   "dependencies": {
     "express": "^5.1.0",
+    "mongoose": "^8.18.0",
     "morgan": "^1.10.1"
   }
 }

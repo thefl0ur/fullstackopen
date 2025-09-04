@@ -15,3 +15,8 @@ Run app in dev mode (reload on changes)
 ```bash
 npm run dev
 ```
+
+Running mongo reader/writer
+```bash 
+source .env && node mongo.js $MONGO_PASSWORD [user] [phone]
+```
