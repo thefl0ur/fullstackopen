@@ -87,3 +87,10 @@ describe('favorite blog', () => {
     assert.deepStrictEqual(result, blogs.filter( x=> x._id == '5a422b3a1b54a676234d17f9')[0])
   })
 })
+
+describe('author of most blogs', () => {
+  test('author of most blogs', () => {
+    const result = listHelper.mostBlogs(blogs)
+    assert.strictEqual(result, 'Robert C. Martin')
+  })
+})
