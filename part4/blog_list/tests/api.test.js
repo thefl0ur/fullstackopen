@@ -14,13 +14,14 @@ test('list blogs', async () => {
   assert.strictEqual(response.body.length, test_hepers.initialData.length)
 })
 
+test('identifier name is id', async () => {
+    const response = await api.get('/api/blogs')
+    assert.notStrictEqual(response.body[0].id, undefined, 'Expected id to be defined')
+})
+
 beforeEach(async () => {
   await Blog.deleteMany({})
-
-  for (let blog of test_hepers.initialData){
-    let obj = new Blog(blog)
-    await obj.save()
-  }
+  await Blog.insertMany(test_hepers.initialData)
 })
 
 after(async () => {
