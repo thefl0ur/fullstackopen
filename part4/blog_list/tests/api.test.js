@@ -42,6 +42,18 @@ test('create blog', async () => {
   assert.strictEqual(dbDataAfter.length, dbDataBefore.length+1)
 })
 
+test('default likes value', async () => {
+  const blog = {
+    title: 'test',
+    author: 'test',
+    url: 'localhost.com/1',
+  }
+
+  const response = await api.post('/api/blogs').send(blog).expect(201)
+  assert.notStrictEqual(response.body.likes, undefined, 'Expectes "likes" property')
+  assert.strictEqual(response.body.likes, 0)
+})
+
 beforeEach(async () => {
   await Blog.deleteMany({})
   await Blog.insertMany(test_hepers.initialData)
