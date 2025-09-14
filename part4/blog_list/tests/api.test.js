@@ -1,4 +1,4 @@
-const { test, after, beforeEach } = require('node:test')
+const { test, after, beforeEach, describe } = require('node:test')
 const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
@@ -52,6 +52,35 @@ test('default likes value', async () => {
   const response = await api.post('/api/blogs').send(blog).expect(201)
   assert.notStrictEqual(response.body.likes, undefined, 'Expectes "likes" property')
   assert.strictEqual(response.body.likes, 0)
+})
+
+describe('missing required params', async () => {
+  test('Missing title', async () => {
+    const blog = {
+      author: 'test',
+      url: 'localhost.com/1',
+    }
+
+    await api.post('/api/blogs').send(blog).expect(400)
+  })
+
+  test('Missing url', async () => {
+    const blog = {
+      title: 'test',
+      author: 'test',
+    }
+
+    await api.post('/api/blogs').send(blog).expect(400)
+  })
+
+  test('Missing title and url', async () => {
+    const blog = {
+      author: 'test',
+    }
+
+    await api.post('/api/blogs').send(blog).expect(400)
+  })
+
 })
 
 beforeEach(async () => {
