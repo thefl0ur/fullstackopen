@@ -15,8 +15,31 @@ test('list blogs', async () => {
 })
 
 test('identifier name is id', async () => {
-    const response = await api.get('/api/blogs')
-    assert.notStrictEqual(response.body[0].id, undefined, 'Expected id to be defined')
+  const response = await api.get('/api/blogs')
+  assert.notStrictEqual(response.body[0].id, undefined, 'Expected id to be defined')
+})
+
+test('create blog', async () => {
+  const dbDataBefore = await test_hepers.dataInDb()
+  assert.strictEqual(dbDataBefore.length, test_hepers.initialData.length)
+
+  const blog = {
+    title: 'test',
+    author: 'test',
+    url: 'localhost.com/1',
+    likes: 3,
+  }
+
+  const response = await api.post('/api/blogs').send(blog).expect(201)
+  
+  assert.notStrictEqual(response.body.id, undefined, 'Expected id to be defined')
+  assert.strictEqual(blog.title, response.body.title)
+  assert.strictEqual(blog.author, response.body.author)
+  assert.strictEqual(blog.url, response.body.url)
+  assert.strictEqual(blog.likes, response.body.likes)
+  
+  const dbDataAfter = await test_hepers.dataInDb()
+  assert.strictEqual(dbDataAfter.length, dbDataBefore.length+1)
 })
 
 beforeEach(async () => {

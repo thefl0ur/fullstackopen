@@ -1,3 +1,5 @@
+const Blog = require('../models/blog')
+
 const initialData = [
   {
     title: 'TDD harms architecture',
@@ -19,4 +21,9 @@ const initialData = [
   },
 ]
 
-module.exports = {initialData}
+const dataInDb = async () => {
+  const blogs = await Blog.find({})
+  return blogs.map(blog => blog.toJSON())
+}
+
+module.exports = {initialData, dataInDb}
