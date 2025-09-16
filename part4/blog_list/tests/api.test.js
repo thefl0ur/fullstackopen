@@ -83,6 +83,28 @@ describe('missing required params', async () => {
 
 })
 
+describe('delete blog post', async () => {
+  test('delete existing blog', async () => {
+    const dataBeforeDelete = await test_hepers.dataInDb()
+    const idToDelete = dataBeforeDelete[0].id
+    await api.delete(`/api/blogs/${idToDelete}`).expect(204)
+
+    const dataAfterDelete = await test_hepers.dataInDb()
+    assert.strictEqual(dataAfterDelete.length, dataBeforeDelete.length - 1)
+    assert.strictEqual(dataAfterDelete.filter(x=>x.id == idToDelete).length, 0)
+  })
+
+  test('delete unexisting blog', async () => {
+    const dataBeforeDelete = await test_hepers.dataInDb()
+    const removeId = '1234567890'
+    await api.delete(`/api/blogs/${removeId}`).expect(204)
+
+    const dataAfterDelete = await test_hepers.dataInDb()
+    assert.strictEqual(dataAfterDelete.length, dataBeforeDelete.length)
+  })
+})
+
+
 beforeEach(async () => {
   await Blog.deleteMany({})
   await Blog.insertMany(test_hepers.initialData)
