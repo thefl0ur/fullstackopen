@@ -105,6 +105,25 @@ describe('delete blog post', async () => {
 })
 
 
+describe('update likes', async () => {
+  test('update existing blog', async () => {
+    const dataBeforeUpdate = await test_hepers.dataInDb()
+    const idToUpdate = dataBeforeUpdate[0].id
+    const likesBefore = dataBeforeUpdate[0].likes
+    const response = await api.put(`/api/blogs/${idToUpdate}`).send({likes: likesBefore + 1}).expect(200)
+    assert.strictEqual(response.body.likes, likesBefore + 1)
+
+    const dataAfterUpdate = await test_hepers.dataInDb()
+    const updatedDbRecord = dataAfterUpdate.filter(x=>x.id == idToUpdate)
+    assert.strictEqual(updatedDbRecord[0].likes, response.body.likes)
+  })
+
+  test('update existing blog', async () => {
+    const idToUpdate = '1234567890'
+    await api.put(`/api/blogs/${idToUpdate}`).send({likes: 777}).expect(404)
+  })
+})
+
 beforeEach(async () => {
   await Blog.deleteMany({})
   await Blog.insertMany(test_hepers.initialData)
