@@ -1,6 +1,8 @@
 const Blog = require('../models/blog')
+const User = require('../models/user')
+const bcrypt = require('bcrypt')
 
-const initialData = [
+const initialBlogsData = [
   {
     title: 'TDD harms architecture',
     author: 'Robert C. Martin',
@@ -21,9 +23,27 @@ const initialData = [
   },
 ]
 
-const dataInDb = async () => {
+const initialUsersData = [
+  {
+    username: 'test_1',
+    password: bcrypt.hashSync('test1', 10),
+    name: 'Test 1',
+  },
+  {
+    username: 'test_2',
+    password: bcrypt.hashSync('test2', 10),
+    name: 'Test 2',
+  }
+]
+
+const blogsInDb = async () => {
   const blogs = await Blog.find({})
   return blogs.map(blog => blog.toJSON())
 }
 
-module.exports = {initialData, dataInDb}
+const usersInDb = async () => {
+  const users = await User.find({})
+  return users.map(user => user.toJSON())
+}
+
+module.exports = {initialBlogsData, initialUsersData, blogsInDb, usersInDb}

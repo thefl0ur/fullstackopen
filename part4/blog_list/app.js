@@ -3,6 +3,7 @@ const mongoose = require('mongoose')
 const config = require('./utils/config')
 const logger = require('./utils/logger')
 const blogRouter = require('./controllers/blog')
+const userRouter = require('./controllers/user')
 
 const app = express()
 
@@ -21,6 +22,7 @@ mongoose.connect(config.MONGO_URI).then(
 app.use(express.json())
 
 app.use('/api/blogs', blogRouter)
+app.use('/api/users', userRouter)
 
 const unknownEndpoint = (request, response) => {
   response.status(404).send({ error: 'unknown endpoint' })

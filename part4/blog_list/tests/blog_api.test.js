@@ -8,10 +8,15 @@ const assert = require('node:assert')
 
 const api = supertest(app)
 
+beforeEach(async () => {
+  await Blog.deleteMany({})
+  await Blog.insertMany(test_hepers.initialBlogsData)
+})
+
 test('list blogs', async () => {
   const response = await api.get('/api/blogs').expect(200)
 
-  assert.strictEqual(response.body.length, test_hepers.initialData.length)
+  assert.strictEqual(response.body.length, test_hepers.initialBlogsData.length)
 })
 
 test('identifier name is id', async () => {
@@ -20,8 +25,8 @@ test('identifier name is id', async () => {
 })
 
 test('create blog', async () => {
-  const dbDataBefore = await test_hepers.dataInDb()
-  assert.strictEqual(dbDataBefore.length, test_hepers.initialData.length)
+  const dbDataBefore = await test_hepers.blogsInDb()
+  assert.strictEqual(dbDataBefore.length, test_hepers.initialBlogsData.length)
 
   const blog = {
     title: 'test',
@@ -38,7 +43,7 @@ test('create blog', async () => {
   assert.strictEqual(blog.url, response.body.url)
   assert.strictEqual(blog.likes, response.body.likes)
   
-  const dbDataAfter = await test_hepers.dataInDb()
+  const dbDataAfter = await test_hepers.blogsInDb()
   assert.strictEqual(dbDataAfter.length, dbDataBefore.length+1)
 })
 
@@ -85,35 +90,34 @@ describe('missing required params', async () => {
 
 describe('delete blog post', async () => {
   test('delete existing blog', async () => {
-    const dataBeforeDelete = await test_hepers.dataInDb()
+    const dataBeforeDelete = await test_hepers.blogsInDb()
     const idToDelete = dataBeforeDelete[0].id
     await api.delete(`/api/blogs/${idToDelete}`).expect(204)
 
-    const dataAfterDelete = await test_hepers.dataInDb()
+    const dataAfterDelete = await test_hepers.blogsInDb()
     assert.strictEqual(dataAfterDelete.length, dataBeforeDelete.length - 1)
     assert.strictEqual(dataAfterDelete.filter(x=>x.id == idToDelete).length, 0)
   })
 
   test('delete unexisting blog', async () => {
-    const dataBeforeDelete = await test_hepers.dataInDb()
+    const dataBeforeDelete = await test_hepers.blogsInDb()
     const removeId = '1234567890'
     await api.delete(`/api/blogs/${removeId}`).expect(204)
 
-    const dataAfterDelete = await test_hepers.dataInDb()
+    const dataAfterDelete = await test_hepers.blogsInDb()
     assert.strictEqual(dataAfterDelete.length, dataBeforeDelete.length)
   })
 })
 
-
 describe('update likes', async () => {
   test('update existing blog', async () => {
-    const dataBeforeUpdate = await test_hepers.dataInDb()
+    const dataBeforeUpdate = await test_hepers.blogsInDb()
     const idToUpdate = dataBeforeUpdate[0].id
     const likesBefore = dataBeforeUpdate[0].likes
     const response = await api.put(`/api/blogs/${idToUpdate}`).send({likes: likesBefore + 1}).expect(200)
     assert.strictEqual(response.body.likes, likesBefore + 1)
 
-    const dataAfterUpdate = await test_hepers.dataInDb()
+    const dataAfterUpdate = await test_hepers.blogsInDb()
     const updatedDbRecord = dataAfterUpdate.filter(x=>x.id == idToUpdate)
     assert.strictEqual(updatedDbRecord[0].likes, response.body.likes)
   })
@@ -122,11 +126,6 @@ describe('update likes', async () => {
     const idToUpdate = '1234567890'
     await api.put(`/api/blogs/${idToUpdate}`).send({likes: 777}).expect(404)
   })
-})
-
-beforeEach(async () => {
-  await Blog.deleteMany({})
-  await Blog.insertMany(test_hepers.initialData)
 })
 
 after(async () => {
