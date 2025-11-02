@@ -34,6 +34,37 @@ describe('create user', async() => {
     const dbDataAfter = await test_hepers.usersInDb()
     assert.strictEqual(dbDataAfter.length, dbDataBefore.length+1)
   })
+
+  test('create user fail: password is too short', async () => {
+    const newUser = {
+      username: 'test_user',
+      password: 'a',
+      name: 'John Doe',
+    }
+
+    await api.post('/api/users').send(newUser).expect(400)
+  })
+
+  test('create user fail: username is too short', async () => {
+    const newUser = {
+      username: 'a',
+      password: 'pass',
+      name: 'John Doe',
+    }
+
+    await api.post('/api/users').send(newUser).expect(400)
+  })
+
+  test('create user fail: username not uniq', async () => {
+    const dbDataBefore = await test_hepers.usersInDb()
+    const newUser = {
+      username: dbDataBefore[0].username,
+      password: 'pass',
+      name: 'user',
+    }
+
+    await api.post('/api/users').send(newUser).expect(400)
+  })
 })
 
 test('list user', async () => {
