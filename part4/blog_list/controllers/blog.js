@@ -1,18 +1,41 @@
+const lodash = require('lodash')
 const blogRouter = require('express').Router()
 const Blog = require('../models/blog')
 
+const  _get_random_user = async () => {
+  const User = require('../models/user')
+  const users = await User.find({})
+
+  return lodash.sample(users)
+}
+
 blogRouter.get('/', async (request, response) => {
-  const blogs = await Blog.find({})
+  const blogs = await Blog.find({}).populate('user', {'username': 1, 'name': 1})
   return response.json(blogs)
 })
 
 blogRouter.post('/', async (request, response) => {
-  if (!request.body.title || !request.body.url) {
+  const {title, author, url, likes} = request.body
+  
+  if (!title || !url) {
     return response.status(400).send({'error': 'Missing required field'})
   }
 
-  const blog = new Blog(request.body)
+  const user = await _get_random_user()
+
+  const blog = new Blog({
+    title: title,
+    author: author,
+    url: url,
+    likes: likes ?? 0,
+    user: user.id,
+  })
+
   const blogSaved = await blog.save()
+
+  user.blogs = user.blogs.concat(blogSaved._id)
+  await user.save()
+
   return response.status(201).json(blogSaved)
 })
 
