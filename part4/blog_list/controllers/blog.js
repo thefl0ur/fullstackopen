@@ -1,7 +1,6 @@
-const jwt = require('jsonwebtoken')
 const blogRouter = require('express').Router()
 const Blog = require('../models/blog')
-const User = require('../models/user')
+
 
 blogRouter.get('/', async (request, response) => {
   const blogs = await Blog.find({}).populate('user', {'username': 1, 'name': 1})
@@ -9,23 +8,16 @@ blogRouter.get('/', async (request, response) => {
 })
 
 blogRouter.post('/', async (request, response) => {
-  const decodedToken = jwt.verify(request.token, process.env.TOKEN_SIGN)
-  if (!decodedToken.id) {
-    return response.status(401).json({ error: 'Invalid token' })
+  if (!request.user) {
+    return response.status(403).json({ error: 'Permission denied' })
   }
-
-  const user = await User.findById(decodedToken.id)
-
-  if (!user) {
-    return response.status(400).json({ error: 'Invalid user' })
-  }
-
   const {title, author, url, likes} = request.body
   
   if (!title || !url) {
     return response.status(400).send({'error': 'Missing required field'})
   }
 
+  const user = request.user
   const blog = new Blog({
     title: title,
     author: author,
@@ -44,6 +36,12 @@ blogRouter.post('/', async (request, response) => {
 
 blogRouter.delete('/:id', async (request, response) => {
   try {
+    const blog = await Blog.findById(request.params.id)
+
+    if (!request.user || (request.user.id !== String(blog.user._id))) {
+      return response.status(403).json({ error: 'Permission denied' })
+    }
+
     await Blog.findByIdAndDelete(request.params.id)
   }
   catch {
