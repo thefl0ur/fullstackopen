@@ -5,13 +5,40 @@ const app = require('../app')
 const test_hepers = require('../utils/test_helper')
 const Blog = require('../models/blog')
 const assert = require('node:assert')
+const User = require('../models/user')
+const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
 
 const api = supertest(app)
+let token = null
 
 beforeEach(async () => {
   await Blog.deleteMany({})
-  await Blog.insertMany(test_hepers.initialBlogsData)
+  let blogs = await Blog.insertMany(test_hepers.initialBlogsData)
+
+  await User.deleteMany()
+  const saltRounds = 10
+  const passwordHashed = await bcrypt.hash('password', saltRounds)
+  const user = new User({
+    username: 'username',
+    password: passwordHashed,
+    name: 'name',
+  })
+
+  const userSaved = await user.save()
+  const userForToken = {
+    username: userSaved.username,
+    id: userSaved._id,
+  }
+
+  token = jwt.sign(userForToken, process.env.TOKEN_SIGN)
+
+  for (const blog of blogs) {
+    blog.user = userSaved._id
+    await blog.save()
+  }
 })
+
 
 test('list blogs', async () => {
   const response = await api.get('/api/blogs').expect(200)
@@ -24,28 +51,48 @@ test('identifier name is id', async () => {
   assert.notStrictEqual(response.body[0].id, undefined, 'Expected id to be defined')
 })
 
-test('create blog', async () => {
-  const dbDataBefore = await test_hepers.blogsInDb()
-  assert.strictEqual(dbDataBefore.length, test_hepers.initialBlogsData.length)
-
-  const blog = {
-    title: 'test',
-    author: 'test',
-    url: 'localhost.com/1',
-    likes: 3,
-  }
-
-  const response = await api.post('/api/blogs').send(blog).expect(201)
+describe('create blog', async () => {
+  test('create blog normal', async () => {
+    const dbDataBefore = await test_hepers.blogsInDb()
+    assert.strictEqual(dbDataBefore.length, test_hepers.initialBlogsData.length)
   
-  assert.notStrictEqual(response.body.id, undefined, 'Expected id to be defined')
-  assert.strictEqual(blog.title, response.body.title)
-  assert.strictEqual(blog.author, response.body.author)
-  assert.strictEqual(blog.url, response.body.url)
-  assert.strictEqual(blog.likes, response.body.likes)
+    const blog = {
+      title: 'test',
+      author: 'test',
+      url: 'localhost.com/1',
+      likes: 3,
+    }
   
-  const dbDataAfter = await test_hepers.blogsInDb()
-  assert.strictEqual(dbDataAfter.length, dbDataBefore.length+1)
+    const response = await api.post('/api/blogs').send(blog).set('Authorization', `Bearer ${token}`).expect(201)
+    
+    assert.notStrictEqual(response.body.id, undefined, 'Expected id to be defined')
+    assert.strictEqual(blog.title, response.body.title)
+    assert.strictEqual(blog.author, response.body.author)
+    assert.strictEqual(blog.url, response.body.url)
+    assert.strictEqual(blog.likes, response.body.likes)
+    
+    const dbDataAfter = await test_hepers.blogsInDb()
+    assert.strictEqual(dbDataAfter.length, dbDataBefore.length+1)
+  })
+
+  test('create blog by anon', async () => {
+    const dbDataBefore = await test_hepers.blogsInDb()
+    assert.strictEqual(dbDataBefore.length, test_hepers.initialBlogsData.length)
+  
+    const blog = {
+      title: 'test',
+      author: 'test',
+      url: 'localhost.com/1',
+      likes: 3,
+    }
+  
+    await api.post('/api/blogs').send(blog).expect(401)
+
+    const dbDataAfter = await test_hepers.blogsInDb()
+    assert.strictEqual(dbDataAfter.length, dbDataBefore.length)
+  })
 })
+
 
 test('default likes value', async () => {
   const blog = {
@@ -54,7 +101,7 @@ test('default likes value', async () => {
     url: 'localhost.com/1',
   }
 
-  const response = await api.post('/api/blogs').send(blog).expect(201)
+  const response = await api.post('/api/blogs').send(blog).set('Authorization', `Bearer ${token}`).expect(201)
   assert.notStrictEqual(response.body.likes, undefined, 'Expectes "likes" property')
   assert.strictEqual(response.body.likes, 0)
 })
@@ -66,7 +113,7 @@ describe('missing required params', async () => {
       url: 'localhost.com/1',
     }
 
-    await api.post('/api/blogs').send(blog).expect(400)
+    await api.post('/api/blogs').send(blog).set('Authorization', `Bearer ${token}`).expect(400)
   })
 
   test('Missing url', async () => {
@@ -75,7 +122,7 @@ describe('missing required params', async () => {
       author: 'test',
     }
 
-    await api.post('/api/blogs').send(blog).expect(400)
+    await api.post('/api/blogs').send(blog).set('Authorization', `Bearer ${token}`).expect(400)
   })
 
   test('Missing title and url', async () => {
@@ -83,7 +130,7 @@ describe('missing required params', async () => {
       author: 'test',
     }
 
-    await api.post('/api/blogs').send(blog).expect(400)
+    await api.post('/api/blogs').send(blog).set('Authorization', `Bearer ${token}`).expect(400)
   })
 
 })
@@ -92,7 +139,7 @@ describe('delete blog post', async () => {
   test('delete existing blog', async () => {
     const dataBeforeDelete = await test_hepers.blogsInDb()
     const idToDelete = dataBeforeDelete[0].id
-    await api.delete(`/api/blogs/${idToDelete}`).expect(204)
+    await api.delete(`/api/blogs/${idToDelete}`).set('Authorization', `Bearer ${token}`).expect(204)
 
     const dataAfterDelete = await test_hepers.blogsInDb()
     assert.strictEqual(dataAfterDelete.length, dataBeforeDelete.length - 1)

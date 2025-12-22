@@ -9,7 +9,7 @@ blogRouter.get('/', async (request, response) => {
 
 blogRouter.post('/', async (request, response) => {
   if (!request.user) {
-    return response.status(403).json({ error: 'Permission denied' })
+    return response.status(401).json({ error: 'Permission denied' })
   }
   const {title, author, url, likes} = request.body
   
